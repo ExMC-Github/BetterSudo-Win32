@@ -1,0 +1,50 @@
+[package]
+name = "sudo"
+version = "1.0.0"
+edition = "2021"
+description = "Windows 版 sudo：借助 fodhelper 完成 UAC 提权，在当前终端里以管理员身份运行命令"
+license = "MIT"
+
+[lib]
+name = "sudo"
+path = "src/lib.rs"
+
+# 用户直接运行的那个：必须是 console 子系统，cmd.exe 才会等它
+[[bin]]
+name = "sudo"
+path = "src/bin/sudo.rs"
+
+# 提权干活的那个：GUI 子系统，被 shell 拉起也不会有控制台窗口，所以不闪
+[[bin]]
+name = "sudo-elevated"
+path = "src/bin/sudo-elevated.rs"
+
+# 以 SYSTEM 身份运行：console 子系统，SYSTEM 的 cmd 继承当前控制台
+[[bin]]
+name = "su"
+path = "src/bin/su.rs"
+
+[dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_NetworkManagement_NetManagement",
+    "Win32_Security",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Console",
+    "Win32_System_Diagnostics_Debug",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_IO",
+    "Win32_System_Registry",
+    "Win32_System_RemoteDesktop",
+    "Win32_System_SystemServices",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
